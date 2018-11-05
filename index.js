@@ -1,11 +1,12 @@
 const Todo = require('./models/Todo');
+const User = require('./models/User');
 
 //RETREIVE MANY OR ONE
-// Todo.getALL()
-//     .then(results => {
-//         console.log(results);
-//         // console.log('ufbfksjnkx,dex')
-//     })
+User.getAll()
+    .then(results => {
+        console.log(results);
+        console.log('ufbfksjnkx,dex')
+    })
 //example of grabbing one row
 
 // Todo.getbyId(2)
