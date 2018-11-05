@@ -63,3 +63,27 @@ function deleteByID(id) {
 //     })
 
 //UPDATE
+function updateCompleted(id, didComplete) {
+    return db.result(`update todos 
+    set completed =$2
+    where id=$1`, [id, didComplete])
+}
+
+function markCompleted(id) {
+    return updateCompleted(id, true);
+    // return db.result(`update todos set completed = $2 where id = $1`, [id, true]);
+}
+
+function markPending(id) {
+    return updateCompleted(id, false);
+    // return db.result(`update todos set completed = $2 where id=$1`, [id, false]);
+}
+
+function updateName(id, name) {
+    return db.result(`update todos set name = 'walk all the dogs' where id = $1;`, [id]);
+}
+
+markPending(1)
+    .then(result => {
+        console.log(result);
+    })
