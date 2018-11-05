@@ -7,3 +7,12 @@ values
     ('get enough sleep', false),
     ('walk tilly', false),
     ('brush teeth', true);
+
+insert into users
+    (name)
+values
+    ('aylin'),
+    ('beth'),
+    ('chris'),
+    ('bruce'),
+    ('alf');

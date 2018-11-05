@@ -1,13 +1,14 @@
+const Todo = require('./models/Todo');
 
 //RETREIVE MANY OR ONE
-// getALL()
+// Todo.getALL()
 //     .then(results => {
 //         console.log(results);
 //         // console.log('ufbfksjnkx,dex')
 //     })
 //example of grabbing one row
 
-// getbyId(2)
+// Todo.getbyId(2)
 //     .then(results => {
 //         console.log(results)
 //     })
@@ -18,7 +19,7 @@
 //     })
 
 //CREATE
-// add('homework', false)
+// Todo.add('homework', false)
 //     .catch(err => {
 //         console.log(err);
 //     })
@@ -33,7 +34,7 @@
 //     })
 
 //UPDATE
-// markPending(1)
+// Todo.markPending(6)
 //     .then(result => {
 //         console.log(result);
-//     })
+//     })s
