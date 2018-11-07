@@ -85,18 +85,35 @@ let newUsers = [
 // walk.assignToUser(1, 17);
 // task.assignToUser(22)
 
-// clare.getTodos()
-//     .then(result => { console.log(result); })
 
 // Todo.add('walk dog', false)
 //     .then(task => {
 //         task.assignToUser(22);
 //     })
-Todo.getbyId(4)
+
+Todo.getbyId(6)
     .then(task => {
-        task.updateName('sleep some');
-    })
-    .then(newTask => console.log(newTask))
+        //     //     console.log(task.name)
+        //     // })
+        //     // .then(name => name.updateName('eat supper'));
+        task.assignToUser(15);
+        // task.updateCompleted()
+        // task.markCompleted()
+        // task.markPending()
+        // task.deleteByID()
+
+    });
+
+//     .then(task => {
+//         // console.log(task);
+//         task.getTodosForUser(3);
+// })
+//     .then(newTask => console.log(newTask))
+
+// Todo.getTodosForUser(22)
+//     .then(t => console.log(t));
 
 
-// Todo.deleteByID(7);
+// Todo.deleteByID(8);
+
+// Todo.getAll()
