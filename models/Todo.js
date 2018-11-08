@@ -10,8 +10,8 @@ class Todo {
     static add(name, completed) {
         return db.one(`insert into todos (name, completed) values ($1, $2) returning id`, [name, completed])
             .then(data => {
-                const u = new Todo(data.id, name, completed);
-                return u;
+                const t = new Todo(data.id, name, completed);
+                return t;
             });
     }
 
@@ -21,7 +21,7 @@ class Todo {
             .then(arrayOfStuff => {
                 let todoArray = arrayOfStuff.map
                     (todoObj => {
-                        let t = new Todo(todoObj.id, todoObj.name);
+                        let t = new Todo(todoObj.id, todoObj.name, todoObj.completed);
                         return t;
                     });
                 return todoArray;

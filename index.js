@@ -1,7 +1,83 @@
 require('dotenv').config();
+const express = require('express');
+const app = express();
 
 const Todo = require('./models/Todo');
 const User = require('./models/User');
+
+//EXPRESS
+app.listen(3000, () => {
+    console.log('express app ready');
+})
+
+//listen for a get request
+// app.get('/users', (req, res) => {
+//     res.send('Hjnajfkdsnvsldkfjnesld');
+//     User.getAll()
+//         .then(allUsers => {
+//             // .then(allUsers => {
+//             //     console.log(allUsers);
+//             res.send(allUsers);
+//             // res.status(200).json(allUsers);
+//         })
+// });
+
+// app.get('/users/:id(\\d+)', (req, res) => {
+//     console.log(req.params.id);
+//     User.getById(req.params.id)
+//         .then(theUser => { 
+//             res.send(theUser);
+//         })
+//         .catch(err => {
+//             res.send({
+//                 message: `no soup for you`
+//             });
+//         })
+//     // res.send('ok');
+// });
+
+// app.get('/todos', (req, res) => {
+//     // res.send('redjnskfrjgnrf');
+//     Todo.getAll()
+//         .then(allTodos => {
+//             res.send(allTodos);
+//             // res.status(200).json(allTodos);
+//         })
+// })
+
+// app.get('/todos/:id(\\d+)', (req, res) => {
+//     // console.log(req.params.id);
+//     Todo.getbyId(req.params.id)
+//         .then(todo => {
+//             res.send(todo.name);
+//         })
+// })
+
+//example of sending whole page
+//that doens't work  res.send(allUsers) })
+app.get('/users', (req, res) => {
+    // res.send('Hjnajfkdsnvsldkfjnesld');
+    User.getAll()
+        .then(allUsers => {
+            let usersList = ``;
+            allUsers.forEach(user => {
+                usersList += `<li>${user.name}</li>`
+            });
+            let thePage = `
+                        <!doctype>
+                        <html>
+                        <head>
+                        </head>
+                        <body>
+                            <h1>heyya</h1>
+                            <ul>
+                            ${usersList}
+                            </ul>
+                            </body>
+                        </html>`;
+            res.send(thePage);
+        });
+})
 
 //RETREIVE MANY OR ONE
 // User.getTodosForUser(3)
@@ -39,12 +115,12 @@ const User = require('./models/User');
 //     .then(result => {
 //         console.log(result);
 //     })s
-let newUsers = [
-    'buffy',
-    'willow',
-    'xander',
-    'giles',
-]
+// let newUsers = [
+//     'buffy',
+//     'willow',
+//     'xander',
+//     'giles',
+// ]
 
 
 // newUsers.forEach(u => {
@@ -55,9 +131,9 @@ let newUsers = [
 // })
 
 // User.add('clare')
-//     .then(id => {
-//         console.log(id);
-//     }) 
+//     .then(what => {
+//         console.log(what);
+//     })
 
 // User.getById(17)
 //     .then(userFromDB => {
@@ -91,18 +167,18 @@ let newUsers = [
 //         task.assignToUser(22);
 //     })
 
-Todo.getbyId(6)
-    .then(task => {
+// Todo.getbyId(6)
+    // .then(task => {
         //     //     console.log(task.name)
         //     // })
         //     // .then(name => name.updateName('eat supper'));
-        task.assignToUser(15);
+        // task.assignToUser(15);
         // task.updateCompleted()
         // task.markCompleted()
         // task.markPending()
         // task.deleteByID()
 
-    });
+    // });
 
 //     .then(task => {
 //         // console.log(task);

@@ -17,10 +17,10 @@ class User {
     static add(name) {
         return db.one(`
         insert into users (name) values ($1) returning id`, [name])
-            .then(data => {
-                const u = new User(data.id, name);
-                return u;
-            });
+        // .then(data => {
+        //     const u = new User(data.id, name);
+        //     return u;
+        // });
     }
     //a method is a function that "belongs" to an object
     // greet(otherUser) {
@@ -34,6 +34,9 @@ class User {
                 const u = new User(result.id, result.name);
                 return u;
             })
+        // .catch(err => {
+        //     return err;
+        // })
     }
 
     static getAll() {
