@@ -2,6 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 
+const bodyParser = require('body-parser');
+// configure body=parser to read data sent by html form tags
+app.use(bodyParser.urlencoded({ extended: false }));
+//configure body-parser to read JSON bodies
+app.use(bodyParser.json());
+
 const Todo = require('./models/Todo');
 const User = require('./models/User');
 
@@ -11,16 +17,16 @@ app.listen(3000, () => {
 })
 
 //listen for a get request
-// app.get('/users', (req, res) => {
-//     res.send('Hjnajfkdsnvsldkfjnesld');
-//     User.getAll()
-//         .then(allUsers => {
-//             // .then(allUsers => {
-//             //     console.log(allUsers);
-//             res.send(allUsers);
-//             // res.status(200).json(allUsers);
-//         })
-// });
+app.get('/users', (req, res) => {
+    // res.send('Hjnajfkdsnvsldkfjnesld');
+    User.getAll()
+        .then(allUsers => {
+            // .then(allUsers => {
+            //     console.log(allUsers);
+            res.send(allUsers);
+            // res.status(200).json(allUsers);
+        })
+});
 
 // app.get('/users/:id(\\d+)', (req, res) => {
 //     console.log(req.params.id);
@@ -54,30 +60,61 @@ app.listen(3000, () => {
 // })
 
 //example of sending whole page
-//that doens't work  res.send(allUsers) })
-app.get('/users', (req, res) => {
-    // res.send('Hjnajfkdsnvsldkfjnesld');
-    User.getAll()
-        .then(allUsers => {
-            let usersList = ``;
-            allUsers.forEach(user => {
-                usersList += `<li>${user.name}</li>`
-            });
-            let thePage = `
-                        <!doctype>
-                        <html>
-                        <head>
-                        </head>
-                        <body>
-                            <h1>heyya</h1>
-                            <ul>
-                            ${usersList}
-                            </ul>
-                            </body>
-                        </html>`;
-            res.send(thePage);
-        });
-})
+//     res.send(allUsers) })
+// app.get('/users', (req, res) => {
+//     // res.send('Hjnajfkdsnvsldkfjnesld');
+//     User.getAll()
+//         .then(allUsers => {
+//             let usersList = ``;
+//             allUsers.forEach(user => {
+//                 usersList += `<li>${user.name}</li>`
+//             });
+//             let thePage = `
+//                         <!doctype>
+//                         <html>
+//                         <head>
+//                         </head>
+//                         <body>
+//                             <h1>heyya</h1>
+//                             <ul>
+//                             ${usersList}
+//                             </ul>
+//                             </body>
+//                         </html>`;
+//             res.send(thePage);
+//         });
+// })
+
+//listen for POST requests
+app.post('/users', (req, res) => {
+    console.log(req.body);
+    // res.send('ok');
+    const newUsername = req.body.name;
+    console.log(newUsername);
+    User.add(newUsername)
+        .then(theUser => {
+            res.send(theUser);
+        })
+});
+
+app.post('/users/:id(\\d+', (req, res) => {
+    const id = req.params.id;
+    const newName = req.body.name;
+    console.log(id);
+    console.log(newName);
+    // res.send('ok');
+
+    //Get the user by their id
+    User.getById(id)
+        .then(theUser => {
+            //call that user's updateName method
+            theUser.updateName(newName)
+                .then(result => {
+                    res.send('geriufjknsdmcx');
+                })
+        })
+
+});
 
 //RETREIVE MANY OR ONE
 // User.getTodosForUser(3)
