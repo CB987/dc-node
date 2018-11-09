@@ -16,7 +16,7 @@ class User {
 
     static add(name) {
         return db.one(`
-        insert into users (name) values ($1) returning id`, [name])
+        insert into users (name) values ($1) returning id, name`, [name])
         // .then(data => {
         //     const u = new User(data.id, name);
         //     return u;

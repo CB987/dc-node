@@ -10,20 +10,29 @@ app.use(bodyParser.json());
 
 const Todo = require('./models/Todo');
 const User = require('./models/User');
-
+const page = require('./views/page');
+const userList = require('./views/userList');
 //EXPRESS
 app.listen(3000, () => {
     console.log('express app ready');
 })
 
-//listen for a get request
+app.get('/', (req, res) => {
+    const thePage = page('helloooooo')
+    res.send(thePage);
+})
+
+//listen for a get request (retrieve)
 app.get('/users', (req, res) => {
     // res.send('Hjnajfkdsnvsldkfjnesld');
     User.getAll()
         .then(allUsers => {
             // .then(allUsers => {
             //     console.log(allUsers);
-            res.send(allUsers);
+            // res.send(allUsers);
+            const usersUL = userList(allUsers);
+            const thePage = page(usersUL);
+            res.send(thePage)
             // res.status(200).json(allUsers);
         })
 });
@@ -85,7 +94,7 @@ app.get('/users', (req, res) => {
 //         });
 // })
 
-//listen for POST requests
+//listen for POST requests (create)
 app.post('/users', (req, res) => {
     console.log(req.body);
     // res.send('ok');
@@ -97,7 +106,8 @@ app.post('/users', (req, res) => {
         })
 });
 
-app.post('/users/:id(\\d+', (req, res) => {
+//technically an update, not a create, but using POST bc html cannot send PUT or DELETE, only GET and POST. could also use ajax.
+app.post('/users/id/:id(\\d+)', (req, res) => {
     const id = req.params.id;
     const newName = req.body.name;
     console.log(id);
@@ -108,12 +118,39 @@ app.post('/users/:id(\\d+', (req, res) => {
     User.getById(id)
         .then(theUser => {
             //call that user's updateName method
-            theUser.updateName(newName)
+            theUser.updateMyName(newName)
                 .then(result => {
-                    res.send('geriufjknsdmcx');
-                })
-        })
+                    if (result.rowCount === 1) {
+                        res.send('confirmed');
+                    } else {
+                        res.send('sorry');
+                    }
+                });
+        });
+});
 
+//could do ([a-z0-9]+) for alphanumeric possibilties
+// app.post(/^\/usres\/:id(\d+)/, (req, res) => { // << this is 'regular expression'
+app.post('/users/name/:name([a-z]+)', (req, res) => {
+    const name = req.params.name;
+    const newName = req.body.name;
+    console.log(id);
+    console.log(newName);
+    // res.send('ok');
+
+    //Get the user by their name
+    User.searchByName(id)
+        .then(theUser => {
+            //call that user's updateName method
+            theUser.updateMyName(newName)
+                .then(result => {
+                    if (result.rowCount === 1) {
+                        res.send('confirmed');
+                    } else {
+                        res.send('sorry');
+                    }
+                });
+        });
 });
 
 //RETREIVE MANY OR ONE
