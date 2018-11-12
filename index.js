@@ -1,21 +1,22 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-
 const bodyParser = require('body-parser');
+
+
+app.use(express.static('public')); //serves files from 'public' folder as though it was the root
+
 // configure body=parser to read data sent by html form tags
 app.use(bodyParser.urlencoded({ extended: false }));
 //configure body-parser to read JSON bodies
 app.use(bodyParser.json());
 
-const Todo = require('./models/Todo');
 const User = require('./models/User');
 const page = require('./views/page');
 const userList = require('./views/userList');
+const todoList = require('./views/todoList');
+const userForm = require('./views/userForm');
 //EXPRESS
-app.listen(3000, () => {
-    console.log('express app ready');
-})
 
 app.get('/', (req, res) => {
     const thePage = page('helloooooo')
@@ -24,79 +25,21 @@ app.get('/', (req, res) => {
 
 //listen for a get request (retrieve)
 app.get('/users', (req, res) => {
-    // res.send('Hjnajfkdsnvsldkfjnesld');
     User.getAll()
         .then(allUsers => {
-            // .then(allUsers => {
-            //     console.log(allUsers);
             // res.send(allUsers);
             const usersUL = userList(allUsers);
             const thePage = page(usersUL);
-            res.send(thePage)
-            // res.status(200).json(allUsers);
+            console.log(thePage);
+            res.send(thePage);
+            // res.send(page(userList(allUsers)));
         })
 });
 
-// app.get('/users/:id(\\d+)', (req, res) => {
-//     console.log(req.params.id);
-//     User.getById(req.params.id)
-//         .then(theUser => { 
-//             res.send(theUser);
-//         })
-//         .catch(err => {
-//             res.send({
-//                 message: `no soup for you`
-//             });
-//         })
-//     // res.send('ok');
-// });
-
-// app.get('/todos', (req, res) => {
-//     // res.send('redjnskfrjgnrf');
-//     Todo.getAll()
-//         .then(allTodos => {
-//             res.send(allTodos);
-//             // res.status(200).json(allTodos);
-//         })
-// })
-
-// app.get('/todos/:id(\\d+)', (req, res) => {
-//     // console.log(req.params.id);
-//     Todo.getbyId(req.params.id)
-//         .then(todo => {
-//             res.send(todo.name);
-//         })
-// })
-
-//example of sending whole page
-//     res.send(allUsers) })
-// app.get('/users', (req, res) => {
-//     // res.send('Hjnajfkdsnvsldkfjnesld');
-//     User.getAll()
-//         .then(allUsers => {
-//             let usersList = ``;
-//             allUsers.forEach(user => {
-//                 usersList += `<li>${user.name}</li>`
-//             });
-//             let thePage = `
-//                         <!doctype>
-//                         <html>
-//                         <head>
-//                         </head>
-//                         <body>
-//                             <h1>heyya</h1>
-//                             <ul>
-//                             ${usersList}
-//                             </ul>
-//                             </body>
-//                         </html>`;
-//             res.send(thePage);
-//         });
-// })
-
 //listen for POST requests (create)
 app.post('/users', (req, res) => {
-    console.log(req.body);
+    console.log(req);
+    // console.log(req.body);
     // res.send('ok');
     const newUsername = req.body.name;
     console.log(newUsername);
@@ -107,163 +50,74 @@ app.post('/users', (req, res) => {
 });
 
 //technically an update, not a create, but using POST bc html cannot send PUT or DELETE, only GET and POST. could also use ajax.
-app.post('/users/id/:id(\\d+)', (req, res) => {
+app.post('/users/:id([0-9]+)/edit', (req, res) => {
     const id = req.params.id;
     const newName = req.body.name;
-    console.log(id);
-    console.log(newName);
-    // res.send('ok');
-
     //Get the user by their id
     User.getById(id)
         .then(theUser => {
             //call that user's updateName method
             theUser.updateMyName(newName)
-                .then(result => {
-                    if (result.rowCount === 1) {
-                        res.send('confirmed');
+                .then(didUpdate => {
+                    if (didUpdate) {
+                        res.redirect(`/users/`)
                     } else {
-                        res.send('sorry');
+                        res.send('boo');
                     }
+                    // }
                 });
         });
 });
 
-//could do ([a-z0-9]+) for alphanumeric possibilties
-// app.post(/^\/usres\/:id(\d+)/, (req, res) => { // << this is 'regular expression'
-app.post('/users/name/:name([a-z]+)', (req, res) => {
-    const name = req.params.name;
-    const newName = req.body.name;
-    console.log(id);
-    console.log(newName);
+app.get('/users/:id([0-9]+)', (req, res) => {
+    // console.log(req.params.id);
+    User.getById(req.params.id)
+        .catch(err => {
+            res.send({
+                message: `no soup for you`
+            })
+                .then(theUser => {
+                    res.send(page(userForm(theUser)));
+                })
+        })
     // res.send('ok');
-
-    //Get the user by their name
-    User.searchByName(id)
-        .then(theUser => {
-            //call that user's updateName method
-            theUser.updateMyName(newName)
-                .then(result => {
-                    if (result.rowCount === 1) {
-                        res.send('confirmed');
-                    } else {
-                        res.send('sorry');
-                    }
-                });
-        });
 });
 
-//RETREIVE MANY OR ONE
-// User.getTodosForUser(3)
-//     .then(result => { console.log(result); })
+app.get('/users/:id([0-9]+)', (req, res) => {
+    User.getById(req.params.id)
+        .catch(err => {
+            res.send({
+                mesage: 'no soup for you'
+            });
+        })
+        .then(theUser => {
+            res.send(theUser);
 
-//example of grabbing one row
+        })
+});
 
-// Todo.getbyId(2)
-//     .then(results => {
-//         console.log(results)
-//     })
+app.get(`/users/:id(\\d+)/todos`, (req, res) => {
+    User.getById(req.params.id)
+        .then(theUser => {
+            theUser.getTodos()
+                .then(allTOdos => {
+                    const todosUL = todoList(allTodos);
+                    const thePage = page(todosUS);
+                    res.send(thePage);
+                })
+        })
+});
 
-// getbyId(20)
-//     .then(results => {
-//         console.log(results)
-//     })
+app.get('/users/register', (req, res) => {
+    User.getById(req.params.id)
+        .then(user => {
+            user.updateName(req.params.newName)
+                .then(() => {
+                    res.send('you just renamed them!');
+                })
+        })
+});
 
-//CREATE
-// Todo.add('homework', false)
-//     .catch(err => {
-//         console.log(err);
-//     })
-//     .then(result => {
-//         console.log(result);
-//     })
-
-//DELETE
-// deleteByID(4)
-//     .then(result => {
-//         console.log(result);
-//     })
-
-//UPDATE
-// Todo.markPending(6)
-//     .then(result => {
-//         console.log(result);
-//     })s
-// let newUsers = [
-//     'buffy',
-//     'willow',
-//     'xander',
-//     'giles',
-// ]
-
-
-// newUsers.forEach(u => {
-//     User.add(u)
-//         .then(aNewUser => {
-//             aNewUser.addTodo('dothething');
-//         })
-// })
-
-// User.add('clare')
-//     .then(what => {
-//         console.log(what);
-//     })
-
-// User.getById(17)
-//     .then(userFromDB => {
-//         return userFromDB.getTodos()
-//     })
-//     .then(todos => {
-//         console.log(todos);
-//     });
-
-// User.getAll()
-//     .then(allUsers => {
-//         allUsers.forEach(user => {
-//             console.log(user.name, user.id);
-//         })
-//     })
-
-// User.searchByName('ylin')
-//     .then(users => {
-//         console.log(users);
-//     });
-
-// User.updateName(14, 'steven');
-
-// const task = new Todo(17, 'do something');
-// walk.assignToUser(1, 17);
-// task.assignToUser(22)
-
-
-// Todo.add('walk dog', false)
-//     .then(task => {
-//         task.assignToUser(22);
-//     })
-
-// Todo.getbyId(6)
-    // .then(task => {
-        //     //     console.log(task.name)
-        //     // })
-        //     // .then(name => name.updateName('eat supper'));
-        // task.assignToUser(15);
-        // task.updateCompleted()
-        // task.markCompleted()
-        // task.markPending()
-        // task.deleteByID()
-
-    // });
-
-//     .then(task => {
-//         // console.log(task);
-//         task.getTodosForUser(3);
-// })
-//     .then(newTask => console.log(newTask))
-
-// Todo.getTodosForUser(22)
-//     .then(t => console.log(t));
-
-
-// Todo.deleteByID(8);
-
-// Todo.getAll()
+app.listen(3000, () => {
+    console.log('express is ready');
+});

@@ -9,10 +9,10 @@ values
     ('brush teeth', true);
 
 insert into users
-    (name)
+    (name, username, password)
 values
-    ('aylin'),
-    ('beth'),
-    ('chris'),
-    ('bruce'),
-    ('alf');
+    ('aylin', 'aylin', ''),
+    ('beth', 'beth', ''),
+    ('chris', 'chris', ''),
+    ('bruce', 'bruce', ''),
+    ('alf', 'alf', '');

@@ -4,7 +4,9 @@
 
 create table users (
     id serial primary key,
-    name text
+    name text,
+    username varchar(200) not null,
+    password varchar(60) not null --for storing hash
 );
 
 create table todos (

@@ -1,26 +1,22 @@
 const db = require('./db');
 
-
-
-
 //CREATE (class method)
-//declare a class namesd 'user'
+//declare a class named 'user'
 class User {
     //what properties should a user strt off with?
     constructor(id, name) {
         //constructor is a method that is automatially called when you create a user. define properties that are also the names of the database columns.
-        this.name = name;
         this.id = id;
+        this.name = name;
     }
-
 
     static add(name) {
         return db.one(`
         insert into users (name) values ($1) returning id, name`, [name])
-        // .then(data => {
-        //     const u = new User(data.id, name);
-        //     return u;
-        // });
+            .then(data => {
+                const u = new User(data.id, name);
+                return u;
+            });
     }
     //a method is a function that "belongs" to an object
     // greet(otherUser) {
@@ -41,7 +37,7 @@ class User {
 
     static getAll() {
         return db.any(`
-        select * from users
+        select * from users order by id
         `).then(userArray => {
                 //transform array of objects into array of User instances
                 let instanceArray = userArray.map(userObj => {
@@ -61,12 +57,15 @@ class User {
             where name ilike '%$1:raw%'`, [name]);
     }
     //UPDATE (class method)
-    static updateName(id, name) {
-        return db.result(`update users set name = $2 where id=$1`, [id, name])
-    }
-    updateMyName(name) {
+    // static updateName(id, name) {
+    //     return db.result(`update users set name = $2 where id=$1`, [id, name])
+    // }
+    updateName(name) {
         this.name = name;
         return db.result(`update users set name = $2 where id=$1`, [this.id, name])
+            .then(result => {
+                return result.rowCount === 1;
+            })
     }
 
     addTodo(id, task) {
