@@ -66,6 +66,12 @@ class User {
             })
     }
 
+    passwordDoesMatch(loginPassword) {
+        const didMatch = bcrypt.compareSync(loginPassword, this.pwhash);
+        return didMatch;
+    }
+
+
     getTodos() {
         return db.any(`select * from todos where user_id = $1`, [this.id]);
     }

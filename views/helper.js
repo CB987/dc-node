@@ -16,7 +16,29 @@ function footer() {
     `;
 }
 
+function logoutButton() {
+    return `
+    <div>
+        <form action="/logout" method="POST">
+            <input type="submit" value="logout">
+        </form>
+    </div>
+    `;
+}
+
+function loginOrRegister() {
+    return `
+    <div>
+    <a href="/login">login</a>
+    |
+    <a href="/register">register</a>
+    </div>
+    `;
+}
+
 module.exports = {
     header,
-    footer
+    footer,
+    logoutButton,
+    loginOrRegister
 };

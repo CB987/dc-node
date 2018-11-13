@@ -11,6 +11,12 @@ html, body {
     width: 100%;
     background-color: olivedrab;
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    color: black;
+    text-shadow:
+    -0.5px -0.5px 0 orangered,  
+    0.5px -0.5px 0 orangered,
+    -0.5px 0.5px 0 darkred,
+    0.5px 0.5px 0 darkred;
     /* text-decoration-line: red; */
 }
 

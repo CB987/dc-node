@@ -2,7 +2,18 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
+
+const session = require('express-session');
+const pgSession = require('connect-pg-simple')(session);
+const db = require('./models/db');
+app.use(session({
+    store: new pgSession({
+        pgPromise: db
+    }),
+    secret: 'abc123', //helps session mgr create unique ids for users
+    saveUninitialized: false
+}));
 
 //serves files from 'public' folder as though it was the root
 app.use(express.static('public'));
@@ -75,13 +86,19 @@ app.post('/register', (req, res) => {
     User.add(newName, newUsername, newPassword)
         .then(newUser => {
             // if that works, redirect to welcome page
+            req.session.user = newUser;
             res.redirect('/welcome');
 
         });
 });
 app.get('/welcome', (req, res) => {
     //send them the welcome page
-    res.send(page('<h1>congrats, you\'re in!</h1>'));
+    console.log(req.session.user);
+    let visitorName = 'Person of the World';
+    if (req.session.user) {
+        visitorName = req.session.user.username;
+    }
+    res.send(page(`<h1>congrats, you\'re in, ${visitorName}!</h1>`));
 });
 
 //USER LOGIN
@@ -100,18 +117,19 @@ app.post('/login', (req, res) => {
     console.log(loginUsername);
     User.getByUsername(loginUsername)
 
-        .then(user => {
-            console.log(user);
-            return user;
-        })
+        // .then(user => {
+        //     console.log(user);
+        //     return user;
+        // })
         .catch(err => {
             console.log(err);
             res.redirect('/login');
         })
         .then(theUser => {
-            const didMatch = bcrypt.compareSync(loginPassword, theUser.pwhash);
-            if (didMatch) {
-                res.redirect('/welcome');
+            // const didMatch = bcrypt.compareSync(loginPassword, theUser.pwhash);
+            if (theUser.passwordDoesMatch(loginPassword)) {
+                req.session.user = theUser;
+                res.send(page(`<h1> hey ${req.session.user.username}</h1>`));
             } else {
                 res.redirect('/login');
             }
@@ -122,6 +140,13 @@ app.post('/login', (req, res) => {
     //     res.redirect(`./id/:$1/todos`, [this.id])
     // })
 });
+
+app.post('/logout', (req, res) => {
+    //1. annihilate the session
+    req.session.destroy();
+    //2. redirect to homepage
+    res.redirect('/');
+})
 
 
 
