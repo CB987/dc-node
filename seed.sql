@@ -9,7 +9,7 @@ values
     ('brush teeth', true);
 
 insert into users
-    (name, username, password)
+    (name, username, pwhash)
 values
     ('aylin', 'aylin', ''),
     ('beth', 'beth', ''),

@@ -6,7 +6,7 @@ function todoToItem(todoObject) {
     `;
 }
 
-function todoList(arayofTodos) {
+function todoList(arrayofTodos) {
     const todoItems = arrayofTodos.map(todoToItem).join('');
     return `
         <ul>

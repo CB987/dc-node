@@ -1,20 +1,30 @@
 const db = require('./db');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 //CREATE (class method)
 //declare a class named 'user'
 class User {
     //what properties should a user strt off with?
-    constructor(id, name) {
+    constructor(id, name, username, pwhash) {
         //constructor is a method that is automatially called when you create a user. define properties that are also the names of the database columns.
         this.id = id;
         this.name = name;
+        this.username = username;
+        this.pwhash = pwhash;
     }
 
-    static add(name) {
+    static add(name, username, password) {
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const hash = bcrypt.hashSync(password, salt);
         return db.one(`
-        insert into users (name) values ($1) returning id, name`, [name])
+        insert into users 
+            (name, username, pwhash) 
+        values 
+            ($1, $2, $3) 
+        returning id, name`, [name, username, hash])
             .then(data => {
-                const u = new User(data.id, name);
+                const u = new User(data.id, name, username);
                 return u;
             });
     }
@@ -25,9 +35,9 @@ class User {
     //RETRIEVE (class method)
 
     static getById(id) {
-        return db.one('select * from users where id = $1', [id])
+        return db.one(`select * from users where id = $1`, [id])
             .then(result => {
-                const u = new User(result.id, result.name);
+                const u = new User(result.id, result.name, result.username);
                 return u;
             })
         // .catch(err => {
@@ -48,8 +58,16 @@ class User {
             })
     }
 
+    static getByUsername(username) {
+        return db.one(`
+        select * from users where username ilike '%$1:raw%'
+        `, [username]).then(result => {
+                return new User(result.id, result.name, result.username, result.pwhash);
+            })
+    }
+
     getTodos() {
-        return db.any('select * from todos where user_id = $1', [this.id]);
+        return db.any(`select * from todos where user_id = $1`, [this.id]);
     }
 
     static searchByName(name) {
@@ -80,33 +98,34 @@ class User {
         return db.result(`delete from users where id = $1`, [this.id]);
     }
 }
-//CREATE
-function add(name) {
-    return db.one(`insert into users (name) 
-    values
-        ($1)
-        returning id
-        `, [name]);
-}
+module.exports = User;
+// //CREATE
+// function add(name) {
+//     return db.one(`insert into users (name) 
+//     values
+//         ($1)
+//         returning id
+//         `, [name]);
+// }
 
-//RETREIVE
-function getAll() {
-    return db.any(`select * from users`);
-}
+// //RETREIVE
+// function getAll() {
+//     return db.any(`select * from users`);
+// }
 
-function getById(id) {
-    return db.one(`select * from users where id = $1`, [id]);
-}
+// function getById(id) {
+//     return db.one(`select * from users where id = $1`, [id]);
+// }
 
-//UPDATE
-function updateName(id, name) {
-    return db.result(`update users set name = $2 where id=$1`, [id, name])
-}
+// //UPDATE
+// function updateName(id, name) {
+//     return db.result(`update users set name = $2 where id=$1`, [id, name])
+// }
 
-//DELETE
-function deleteByID(id) {
-    return db.result(`delete from users where id = $1`, [id]);
-}
+// //DELETE
+// function deleteByID(id) {
+//     return db.result(`delete from users where id = $1`, [id]);
+// }
 
 // module.exports = {
 //     add,
@@ -115,5 +134,3 @@ function deleteByID(id) {
 //     getById,
 //     updateName,
 // }
-
-module.exports = User;

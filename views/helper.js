@@ -10,7 +10,7 @@ function footer() {
     return `
     <footer>
         <p>
-            &copy; 2018 please don't give me credit for this
+            &copy; 2018 please don't judge me by this
         </p>
     </footer>
     `;
